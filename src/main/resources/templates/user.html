@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+      lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Users list</title>
+</head>
+<body>
+<header>
+    <!--    Header-->
+    <div class="container-fluid">
+        <div class="userInfoBar row align-items-center bg-dark" style="height: 50px">
+
+        </div>
+    </div>
+</header>
+<section class="a">
+    <div class="container-fluid bg-light">
+        <div class="row">
+            <!--            Sidebar-->
+            <div class="col sidebar pt-3 bg-white" style="height:100vh">
+                <div class="list-group">
+                    <div sec:authorize="hasRole('ADMIN')">
+                        <a th:href="@{/admin}" class="list-group-item list-group-item-action">Admin</a>
+                    </div>
+                    <a th:href="@{/user}" class="list-group-item list-group-item-action active">User</a>
+                </div>
+            </div>
+            <div class="col-10 bg-light pt-3" style="height:100vh">
+                <div class="container-fluid active">
+                    <h2>User's info</h2>
+                    <div class="row border bg-white pl-0">
+                        <div class="col border bg-light">
+                            <p><h6>About user</h6>
+                        </div>
+                        <table class="userInfoTable table table-hover">
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<br/>
+
+<script>
+    const userInfoBar = document.querySelector(".userInfoBar")
+    const userInfoTable = document.querySelector('.userInfoTable')
+
+    let outputInfoBar = ''
+    let outputUserInfoTable = ''
+
+    const userInfoUrl = 'http://localhost:8080/api/showUser'
+
+    fetch(userInfoUrl)
+        .then(response => response.json())
+        .then(user => {
+            let rolesList = '';
+
+            for (let i = 0; i < user.roles.length; i++) {
+                rolesList += user.roles[i].name + ' '
+            }
+
+            // User info bar
+            outputInfoBar += `
+            <div class="col text-nowrap text-light">
+                ${user.username} with roles: ${rolesList}
+            </div>
+            <div class="col text-right">
+                <a href="/logout" class="text-secondary">Logout</a>
+            </div>
+            `
+            userInfoBar.innerHTML = outputInfoBar
+
+            // User info table
+            outputUserInfoTable += `
+            <thead class="thead-light">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Surname</th>
+                                <th scope="col">Age</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Roles</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>${user.id}</td>
+                                <td>${user.name}</td>
+                                <td>${user.surname}</td>
+                                <td>${user.age}</td>
+                                <td>${user.username}</td>
+                                <td>${rolesList}</td>
+                            </tr>
+                            </tbody>
+            `
+            userInfoTable.innerHTML = outputUserInfoTable
+        })
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
