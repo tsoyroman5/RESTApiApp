@@ -15,4 +15,5 @@ public class LoginController {
     public String userPage() {
         return "user";
     }
+
 }
