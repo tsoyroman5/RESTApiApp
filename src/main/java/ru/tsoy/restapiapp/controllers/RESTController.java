@@ -11,7 +11,6 @@ import ru.tsoy.restapiapp.service.RoleService;
 import ru.tsoy.restapiapp.service.UserService;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api")
@@ -36,6 +35,11 @@ public class RESTController {
         return ResponseEntity.ok(userService.findUserByUsername(name));
     }
 
+    @GetMapping("/findUserById/{id}")
+    public ResponseEntity<User> findUserById(@PathVariable long id) {
+        return ResponseEntity.ok(userService.findUserById(id));
+    }
+
     @GetMapping("/allUsers")
     public ResponseEntity<List<User>> allUsers() {
         return ResponseEntity.ok(userService.userList());
@@ -48,14 +52,16 @@ public class RESTController {
     }
 
     @PutMapping("/updateUser/{id}")
-    public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable long id) {
-        try {
-            User updatedUser = userService.findUserById(id);
-            userService.addUser(user);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Void> updateUser(@RequestBody User user, @PathVariable long id) {
+        User updatedUser = userService.findUserById(id);
+        updatedUser.setName(user.getName());
+        updatedUser.setSurname(user.getSurname());
+        updatedUser.setAge(user.getAge());
+        updatedUser.setUsername(user.getUsername());
+        updatedUser.setPassword(user.getPassword());
+        updatedUser.setRoles(user.getRoles());
+        userService.addUser(updatedUser);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteUser/{id}")

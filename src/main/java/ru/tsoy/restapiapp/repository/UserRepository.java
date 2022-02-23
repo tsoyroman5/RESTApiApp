@@ -19,5 +19,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT user FROM User user JOIN FETCH user.roles where user.id = :id")
     User findUserById(@Param("id") long id);
-
 }
