@@ -45,6 +45,7 @@ function editUserModal(id) {
                     value="${user.password}" name="password" id="editPassword">`
         })
 }
+
 function deleteUserModal(id) {
     fetch('http://localhost:8080/api/findUserById/' + id)
         .then(response => response.json())
@@ -97,6 +98,40 @@ function deleteUserModal(id) {
         })
 }
 
+function showUsers(users) {
+
+    users.forEach(user => {
+        let rolesList = ''
+        for (let i = 0; i < user.roles.length; i++) {
+            rolesList += user.roles[i].name + ' '
+        }
+
+        outputUsersInfoTable += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.surname}</td>
+                        <td>${user.age}</td>
+                        <td>${user.username}</td>
+                        <td>${rolesList}</td>
+                        <td>
+                            <button type="button" data-target="#editModal" class="btn btn-info" data-toggle="modal"
+                                onclick="editUserModal(${user.id})">
+                                    Edit
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" data-target="#deleteModal" class="btn btn-danger" data-toggle="modal"
+                                onclick="deleteUserModal(${user.id})">
+                                    Delete
+                            </button>
+                        </td>
+                    </tr>
+            `
+    })
+    document.querySelector('.usersInfoTable').innerHTML = outputUsersInfoTable
+}
+
 
 // InfoBar
 fetch('http://localhost:8080/api/showUser')
@@ -123,38 +158,9 @@ fetch('http://localhost:8080/api/showUser')
 // Users table
 fetch('http://localhost:8080/api/allUsers')
     .then(response => response.json())
-    .then(data => {
-        data.forEach(user => {
-            let rolesList = ''
-
-            for (let i = 0; i < user.roles.length; i++) {
-                rolesList += user.roles[i].name + ' '
-            }
-
-            outputUsersInfoTable += `
-                    <tr>
-                        <td>${user.id}</td>
-                        <td>${user.name}</td>
-                        <td>${user.surname}</td>
-                        <td>${user.age}</td>
-                        <td>${user.username}</td>
-                        <td>${rolesList}</td>
-                        <td>
-                            <button type="button" data-target="#editModal" class="btn btn-info" data-toggle="modal"
-                                onclick="editUserModal(${user.id})">
-                                    Edit
-                            </button>
-                        </td>
-                        <td>
-                            <button type="button" data-target="#deleteModal" class="btn btn-danger" data-toggle="modal"
-                                onclick="deleteUserModal(${user.id})">
-                                    Delete
-                            </button>
-                        </td>
-                    </tr>
-            `
-            document.querySelector('.usersInfoTable').innerHTML = outputUsersInfoTable
-        })
+    .then(users => {
+        outputUsersInfoTable = ''
+        showUsers(users)
     })
 
 
@@ -180,14 +186,16 @@ document.querySelector('.newUserForm').addEventListener('submit', (e) => {
 
     let userRoles = []
 
-    let array = Array.from(document.getElementById('roleSelect').options)
+    let array = Array.from(document.getElementById('newUserRoleSelect').options)
 
     for (let i = 0; i < array.length; i++) {
-        let role = {
-            id: i + 1,
-            name: array[i].value
+        if (array[i].selected) {
+            let role = {
+                id: i + 1,
+                name: array[i].value
+            }
+            userRoles.push(role)
         }
-        userRoles.push(role)
     }
 
     let user = {
@@ -208,7 +216,11 @@ document.querySelector('.newUserForm').addEventListener('submit', (e) => {
         body: JSON.stringify(user)
     })
         .then(response => response.json())
-        .then(data => console.log(data))
+        .then(users => {
+            outputUsersInfoTable = ''
+            showUsers(users)
+        })
+    location.replace("http://localhost:8080/admin")
 })
 
 // Edit user
@@ -217,14 +229,16 @@ document.querySelector('.editUserForm').addEventListener('submit', (e) => {
 
     let userRoles = []
 
-    let array = Array.from(document.getElementById('roleSelect').options)
+    let array = Array.from(document.getElementById('editUserRoleSelect').options)
 
     for (let i = 0; i < array.length; i++) {
-        let role = {
-            id: i + 1,
-            name: array[i].value
+        if (array[i].selected) {
+            let role = {
+                id: i + 1,
+                name: array[i].value
+            }
+            userRoles.push(role)
         }
-        userRoles.push(role)
     }
 
     let user = {
@@ -243,10 +257,12 @@ document.querySelector('.editUserForm').addEventListener('submit', (e) => {
         },
         body: JSON.stringify(user)
     })
-        .then(function () {
+        .then(response => response.json())
+        .then(users => {
+            outputUsersInfoTable = ''
+            showUsers(users)
             $('#editModal').modal('hide')
         })
-
 })
 
 // Delete user
@@ -257,10 +273,11 @@ document.querySelector('.deleteUserForm').addEventListener('submit', (e) => {
     fetch('http://localhost:8080/api/deleteUser/' + document.getElementById('deleteId').value, {
         method: 'DELETE'
     })
-        .then(function () {
+        .then(response => response.json())
+        .then(users => {
+            outputUsersInfoTable = ''
+            showUsers(users)
             $('#deleteModal').modal('hide')
         })
-
-
 })
 

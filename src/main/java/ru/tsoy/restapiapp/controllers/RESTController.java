@@ -1,6 +1,5 @@
 package ru.tsoy.restapiapp.controllers;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -46,13 +45,13 @@ public class RESTController {
     }
 
     @PostMapping("/newUser")
-    public ResponseEntity<Void> newUser(@RequestBody User user) {
+    public ResponseEntity<List<User>> newUser(@RequestBody User user) {
         userService.addUser(user);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(userService.userList());
     }
 
     @PutMapping("/updateUser/{id}")
-    public ResponseEntity<Void> updateUser(@RequestBody User user, @PathVariable long id) {
+    public ResponseEntity<List<User>> updateUser(@RequestBody User user, @PathVariable long id) {
         User updatedUser = userService.findUserById(id);
         updatedUser.setName(user.getName());
         updatedUser.setSurname(user.getSurname());
@@ -61,13 +60,13 @@ public class RESTController {
         updatedUser.setPassword(user.getPassword());
         updatedUser.setRoles(user.getRoles());
         userService.addUser(updatedUser);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(userService.userList());
     }
 
     @DeleteMapping("/deleteUser/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable long id) {
+    public ResponseEntity<List<User>> deleteUser(@PathVariable long id) {
         userService.deleteUser(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(userService.userList());
     }
 
 
