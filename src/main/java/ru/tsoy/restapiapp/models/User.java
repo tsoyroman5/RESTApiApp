@@ -1,6 +1,6 @@
 package ru.tsoy.restapiapp.models;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.util.Collection;
 import java.util.Set;
 
-
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User implements UserDetails{
@@ -29,16 +29,12 @@ public class User implements UserDetails{
 
     @ManyToMany(cascade = CascadeType.REFRESH)
     @Fetch(FetchMode.JOIN)
-//    @JsonManagedReference
     @JoinTable (
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
-
-    public User() {}
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -123,11 +119,4 @@ public class User implements UserDetails{
         this.roles = roles;
     }
 
-    public String rolesToString() {
-        StringBuilder result = new StringBuilder();
-        for (Role role : getRoles()) {
-            result.append(role.toString()).append(" ");
-        }
-        return result.substring(0, result.length()-1);
-    }
 }
